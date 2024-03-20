@@ -1,7 +1,10 @@
 import "dotenv/config.js";
 import express, { Request, Response, json } from "express";
-import { Game, Review, Status, User } from "./models";
-import { userRouter } from "./routes";
+import userRouter from "./routes/user.routes";
+import User from "./models/user.model";
+import Game from "./models/game.model";
+import Review from "./models/review.model";
+import Status from "./models/status.model";
 
 const port = process.env.PORT || 5001;
 
