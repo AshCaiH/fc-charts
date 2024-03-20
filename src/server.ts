@@ -1,16 +1,13 @@
 import "dotenv/config.js";
 import express, { Request, Response, json } from "express";
-import router from "./routes";
-import User from "./models/user.model";
-import Game from "./models/game.model";
-import Review from "./models/review.model";
-import Status from "./models/status.model";
+import { Game, Review, Status, User } from "./models";
+import { userRouter } from "./routes";
 
 const port = process.env.PORT || 5001;
 
 const app = express();
 
-app.use(json(), router);
+app.use(json(), userRouter);
 
 app.get("/health", (req:Request, res:Response) => {
     res.status(200).json({message: "API is healthy"});
