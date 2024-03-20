@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { sendError, sendMessage } from "../functions/responses";
-import User from "../models/user.model";
+import { User } from "../models";
 
 declare global {
     namespace Express {
