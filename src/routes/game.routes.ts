@@ -5,7 +5,7 @@ import { getUser } from "../controllers/user.controllers";
 const gameRouter: Router = Router();
 
 gameRouter.post("/games/addraw", getUser, getGamesFromRaw, addGames);
-gameRouter.post("/games/list", listGames);
+gameRouter.get("/games/list", listGames);
 
 gameRouter.put("/games/getOCID", getOCIDs);
 

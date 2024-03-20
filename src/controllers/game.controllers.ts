@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { sendError, sendMessage } from "../functions/responses";
-import { Game } from "../models";
+import { Game, User, UserGames } from "../models";
 import { delay } from "../functions/common";
 
 export const getGamesFromRaw: RequestHandler = async (req, res, next) => {
@@ -28,7 +28,12 @@ export const addGames: RequestHandler = async (req, res, next) => {
 
         for (const game of req.gameNames!) {
             try {
-                await Game.create({name: game, UserId: req.user?.id});
+                const newGame = await Game.create(
+                    {name: game},
+                    {include: User}
+                );
+
+                await UserGames.create({UserId: req.user?.id, GameId: newGame.id}); 
             } catch (error:any) {
                 rejected.push(game);
             }
@@ -45,8 +50,7 @@ export const listGames: RequestHandler = async (req, res, next) => {
     try {
         const games = await Game.findAll({});
 
-        if (!next) sendMessage(res, "Success", {games: games}, 201);
-        else next();
+        sendMessage(res, "Success", {games: games}, 201);
     } catch (error:any) {
         sendError(req, res, error);
     }
