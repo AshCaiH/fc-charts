@@ -4,6 +4,7 @@ import router from "./routes";
 import User from "./models/user.model";
 import Game from "./models/game.model";
 import Review from "./models/review.model";
+import Status from "./models/status.model";
 
 const port = process.env.PORT || 5001;
 
@@ -22,7 +23,7 @@ app.listen(port, async () => {
     User.sync();
     Game.sync(); // Use { alter: true } while working on model but REMOVE when done.
     Review.sync();
-
+    Status.sync();
 
     console.log(`Server is listening on port ${port}`);
 });
