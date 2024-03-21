@@ -1,8 +1,9 @@
 import "dotenv/config.js";
 import express, { Request, Response, json } from "express";
-import { User, Game, Review } from "./models";
+import { User, Game, UserGames, Review } from "./models";
 import * as models from "./models";
 import * as routers from "./routes";
+import * as types from "./custom"; // Required for custom Request properties.
 
 const port = process.env.PORT || 5001;
 
@@ -15,12 +16,12 @@ app.get("/health", (req:Request, res:Response) => {
 });
 
 app.listen(port, async () => {
-    User.hasMany(Game);
+    User.belongsToMany(Game, { through: UserGames });
+    Game.belongsToMany(User, { through: UserGames })
     Game.hasMany(Review);
 
-    Object.values(models).forEach(model => {
-        model.sync();
-    });
+    Object.values(models).forEach(async model => {await model.sync()});
+    UserGames.sync();
 
     console.log(`Server is listening on port ${port}`);
 });
