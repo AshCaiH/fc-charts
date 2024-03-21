@@ -93,6 +93,25 @@ export const getOCIDs: RequestHandler = async (req, res, next) => {
 };
 
 
+export const setOCIDs: RequestHandler = async (req, res, next) => {
+    try {
+        const updated: Game[] = [];
+
+        for (const [id, ocId] of Object.entries(req.query)) {
+            console.log(ocId);
+            const game = await Game.findOne({where: {id: id}});
+
+            await game?.update({"ocId": ocId});
+            updated.push(game!);
+        }
+        
+        sendMessage(res, "Success", {updated: updated}, 201);
+    } catch (error:any) {
+        sendError(req, res, error);
+    }
+};
+
+
 export const updateGame = () => {
     return null;
 };
