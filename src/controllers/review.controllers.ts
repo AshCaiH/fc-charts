@@ -1,5 +1,7 @@
 import { RequestHandler } from "express";
 import { sendError, sendMessage } from "../functions/responses";
+import { readFile } from 'fs/promises';
+import { filterReviews } from "../functions/reviews";
 
 export const getReviews: RequestHandler = async (req, res) => {
     try {
@@ -30,6 +32,20 @@ export const getReviews: RequestHandler = async (req, res) => {
         // await delay(250);
         
         // sendMessage(res, "Success", {}, 201);
+    } catch (error:any) {
+        sendError(req, res, error);
+    }
+};
+
+
+export const parseTestData: RequestHandler = async (req, res) => {
+    try {
+        const testreviews = await readFile("testfiles/yak8reviews.json", "utf8");
+
+        const parsed = filterReviews(JSON.parse(testreviews));
+        console.log(parsed);
+        
+        sendMessage(res, "Success", {result: parsed}, 201);
     } catch (error:any) {
         sendError(req, res, error);
     }
