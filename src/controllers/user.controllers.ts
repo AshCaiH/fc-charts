@@ -2,15 +2,6 @@ import { RequestHandler } from "express";
 import { sendError, sendMessage } from "../functions/responses";
 import { User } from "../models";
 
-declare global {
-    namespace Express {
-        interface Request {
-            user?: User;
-            gameNames?: string[];
-        }
-    }
-}
-
 export const createUser: RequestHandler = async (req, res, next) => {
     try {
         const user:User = await User.create({
