@@ -6,6 +6,6 @@ const reviewRouter: Router = Router();
 
 reviewRouter.get("/reviews/:gameId", getGameById, getReviews);
 
-reviewRouter.get("/reviewsTest", reviewsTest);
+reviewRouter.get("/reviewsTest/:gameId", reviewsTest);
 
 export default reviewRouter;

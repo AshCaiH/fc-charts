@@ -48,7 +48,7 @@ export const getReviews: RequestHandler = async (req, res) => {
 
 export const reviewsTest: RequestHandler = async (req, res) => {
     try {
-        const reviews = await Review.findAll({where: {GameId: 1}});
+        const reviews = await Review.findAll({where: {GameId: req.params["gameId"]}});
         const average = reviews.map((review) => review.ocScore).reduce((acc, curr) => acc + curr) / reviews.length;
 
         sendMessage(res, `Average score is ${average}`, {}, 201);
