@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { sendError, sendMessage } from "../functions/responses";
-import { readFile } from 'fs/promises';
 import { fetchReviews, filterReviews } from "../functions/reviews";
 import { delay } from "../functions/common";
 import { Game, Review } from "../models";
@@ -22,7 +21,6 @@ export const getReviews: RequestHandler = async (req, res) => {
                 }
             )
 
-            console.log("new reviews: " + reviewCount);
             reviews.push(...response);
 
             response.map((review) => {

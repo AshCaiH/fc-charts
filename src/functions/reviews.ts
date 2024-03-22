@@ -1,4 +1,8 @@
 import { Game } from "../models";
+import { delay } from "./common";
+
+let cooldownTimer: Promise<unknown> | null = null;
+let cooldownCount: number = 0;
 
 export const filterReviews = (reviews: any[]) => {
     
@@ -32,7 +36,11 @@ export const fetchReviews = async (game: Game) : Promise<Response> => {
         headers: headers,
     };    
 
+    if (cooldownCount == 4) await cooldownTimer;
     const response = await fetch(url, options);
+    cooldownTimer = delay(1000);
+    cooldownCount++;
+
     console.log("remaining requests: " + response.headers.get("x-ratelimit-requests-remaining"));
     
     return response;
