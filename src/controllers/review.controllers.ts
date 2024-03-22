@@ -48,13 +48,12 @@ export const getReviews: RequestHandler = async (req, res) => {
 };
 
 
-export const parseTestData: RequestHandler = async (req, res) => {
+export const reviewsTest: RequestHandler = async (req, res) => {
     try {
-        const testreviews = await readFile("testfiles/yak8reviews.json", "utf8");
+        const reviews = await Review.findAll({where: {GameId: 1}});
+        const average = reviews.map((review) => review.ocScore).reduce((acc, curr) => acc + curr) / reviews.length;
 
-        const parsed = filterReviews(JSON.parse(testreviews));
-        
-        sendMessage(res, "Success", {result: parsed}, 201);
+        sendMessage(res, `Average score is ${average}`, {}, 201);
     } catch (error:any) {
         sendError(req, res, error);
     }
