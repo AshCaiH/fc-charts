@@ -9,19 +9,19 @@ export default class Status extends Model {
 }
 
 Status.init({
-    remainingReqs: {
+    requestsRemaining: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
     },
-    reqResetTime: {
+    requestsResetTime: {
         type: DataTypes.DATE,
         allowNull: false,
     },
-    remainingSearches: {
+    searchesRemaining: {
         type: DataTypes.INTEGER.UNSIGNED,
         allowNull: false,
     },
-    searchResetTime: {
+    searchesResetTime: {
         type: DataTypes.DATE,
         allowNull: false,
     },

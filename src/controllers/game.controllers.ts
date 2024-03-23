@@ -65,7 +65,8 @@ export const getOCIDs: RequestHandler = async (req, res, next) => {
 
         for (const game of games) {
             const response = await fetchRequest(
-                `https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`
+                `https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`,
+                "search"
             ).then(
                 (response) => response.text()
             )
