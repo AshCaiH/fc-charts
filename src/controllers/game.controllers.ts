@@ -61,17 +61,24 @@ export const listGames: RequestHandler = async (req, res, next) => {
 export const getOCIDs: RequestHandler = async (req, res, next) => {
     try {
         const games = await Game.findAll({where: {ocId: null}});
-        let results: string[] = [];
+        const allResults: {game: string, results: any[]}[] = [];
 
         for (const game of games) {
-            const response = await fetchRequest(`https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`).then(
-                (response) => response.text()
-            )
 
-            console.log(response);
+            const response = await fetchRequest(`https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`)
+            .then(async (response) => await response.json())
+
+            allResults.push({
+                game: game.name,
+                results: response,
+            })
+
+            console.log(allResults);
         }
 
-        sendMessage(res, "Success", {games: games}, 201);
+        console.log(allResults);
+
+        sendMessage(res, "Success", {results: allResults}, 201);
     } catch (error:any) {
         sendError(req, res, error);
     }
