@@ -3,6 +3,7 @@ import { sendError, sendMessage } from "../functions/responses";
 import { fetchReviews, filterReviews } from "../functions/reviews";
 import { delay } from "../functions/common";
 import { Game, Review } from "../models";
+import { fetchRequest } from "../functions/requests";
 
 export const getReviews: RequestHandler = async (req, res) => {
     try {
@@ -13,7 +14,9 @@ export const getReviews: RequestHandler = async (req, res) => {
         let reviewCount = 0;
 
         do {
-            const response = await fetchReviews(game).then(
+            const response = await fetchRequest(
+                    `https://opencritic-api.p.rapidapi.com/reviews/game/${game.ocId}?skip=${game.skipReviews}`
+                ).then(
                 async (response) => {
                     const data = await response.json()
                     reviewCount = data.length

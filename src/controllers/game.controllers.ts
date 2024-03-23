@@ -1,7 +1,8 @@
-import { RequestHandler } from "express";
+import { RequestHandler, response } from "express";
 import { sendError, sendMessage } from "../functions/responses";
 import { Game, User, UserGames } from "../models";
 import { delay } from "../functions/common";
+import { fetchRequest } from "../functions/requests";
 
 export const getGamesFromRaw: RequestHandler = async (req, res, next) => {
     try {
@@ -63,27 +64,13 @@ export const getOCIDs: RequestHandler = async (req, res, next) => {
         let results: string[] = [];
 
         for (const game of games) {
-            const url = `https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`;
-            const headers : HeadersInit = {
-                'X-RapidAPI-Key': process.env.OC_APIKEY!,
-                'X-RapidAPI-Host': 'opencritic-api.p.rapidapi.com'
-            }
-    
-            const options : RequestInit = {
-                method: 'GET',
-                headers: headers,
-            };
+            const response = await fetchRequest(
+                `https://opencritic-api.p.rapidapi.com/game/search?criteria=${game.name}`
+            ).then(
+                (response) => response.text()
+            )
 
-            try {
-                const response = await fetch(url, options);
-                const result = await response.text();
-                results.push(result);
-                console.log(result);
-            } catch (error) {
-                console.error(error);
-            }
-
-            await delay(250); // Make sure to not make more than 4 reqs a second.
+            console.log(response);
         }
 
         sendMessage(res, "Success", {games: games}, 201);
