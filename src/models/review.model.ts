@@ -9,8 +9,7 @@ export default class Review extends Model {
 
 Review.init({
     ocId: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        autoIncrement: true,
+        type: DataTypes.STRING,
         primaryKey: true,
     },
     ocScore: {
