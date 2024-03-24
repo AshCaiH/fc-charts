@@ -2,19 +2,21 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../db/connection";
 
 export default class User extends Model {
-    public id!: number;
+    public id!: string;
     public name!: string;
+    public publisherName!: string;
 }
 
 User.init({
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        autoIncrement: true,
+        type: DataTypes.STRING,
         primaryKey: true,
     },
     name: {
         type: DataTypes.STRING,
-        allowNull: false,
+    },
+    publisherName: {
+        type: DataTypes.STRING,
     }
 }, {
     timestamps: false,

@@ -2,28 +2,24 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../db/connection";
 
 export default class Status extends Model {
-    public remainingReqs!: number;
-    public reqResetTime!: Date;
-    public remainingSearches!: number;
-    public searchResetTime!: Date;
+    public requestsRemaining!: number;
+    public requestsResetTime!: Date;
+    public searchesRemaining!: number;
+    public searchesResetTime!: Date;
 }
 
 Status.init({
-    remainingReqs: {
+    requestsRemaining: {
         type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
     },
-    reqResetTime: {
+    requestsResetTime: {
         type: DataTypes.DATE,
-        allowNull: false,
     },
-    remainingSearches: {
+    searchesRemaining: {
         type: DataTypes.INTEGER.UNSIGNED,
-        allowNull: false,
     },
-    searchResetTime: {
+    searchesResetTime: {
         type: DataTypes.DATE,
-        allowNull: false,
     },
 }, {
     timestamps: false,
