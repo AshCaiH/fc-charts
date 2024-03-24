@@ -22,24 +22,18 @@ export const fetchRequest = async (url: string) : Promise<Response> => {
 
     const resetTime = new Date(Date.now());
     resetTime.setSeconds(resetTime.getSeconds() + Number(response.headers.get(`x-ratelimit-requests-reset`)!));
-
-    const data = {
-        requestsRemaining: response.headers.get(`x-ratelimit-requests-remaining`),
-        requestsResetTime: resetTime,
-        searchesRemaining: response.headers.get(`x-ratelimit-searches-remaining`),
-        searchesResetTime: resetTime,
-    }
     
-    await Status.findOne({}).then(
-        async (status) => {
-            if (status) {
-                await status.update(data);
-            } else {
-                await Status.create(data);
-            }
-            console.log("remaining requests: " + response.headers.get("x-ratelimit-requests-remaining"));
-        }
-    )
+    const [status, exists] = await Status.findOrCreate({where: {}});
+
+    if (response.headers.get(`x-ratelimit-requests-remaining`)) {
+        status!.requestsRemaining = Number(response.headers.get(`x-ratelimit-requests-remaining`))}
+    if (response.headers.get(`x-ratelimit-requests-reset`)) {
+        status!.requestsResetTime = resetTime;
+        status!.searchesResetTime = resetTime;}
+    if (response.headers.get(`x-ratelimit-searches-remaining`)) {
+        status!.searchesRemaining = Number(response.headers.get(`x-ratelimit-searches-remaining`))}
+
+    await status!.save();
     
     return response;
 }
