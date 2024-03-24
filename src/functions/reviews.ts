@@ -2,9 +2,6 @@ import { Game } from "../models";
 import { delay } from "./common";
 import { fetchRequest } from "./requests";
 
-let cooldownTimer: Promise<unknown> | null = null;
-let cooldownCount: number = 0;
-
 export const filterReviews = (reviews: any[]) => {
     
     reviews = reviews.filter((review: any) => {
