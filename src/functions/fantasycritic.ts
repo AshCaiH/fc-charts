@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { sendError, sendMessage } from "./responses"
+import { User } from "../models";
 
 export const fcRequest: RequestHandler = async (req, res) => {
     try {
@@ -18,7 +19,18 @@ export const fcRequest: RequestHandler = async (req, res) => {
         const response = await fetch(url,options)
         .then(async (response) => response.json())
         .then((response) => {
-            return response.publishers.map((item:any) => item.playerName)
+            const users: User[] = [];
+
+            response.publishers.forEach(async (publisher:any) => {
+                const [user, exists] = await User.findOrCreate({where: {id: publisher.userID}})
+                user.publisherName = ""; // Errors when hitting non-unicode names, dummied out for now.
+                user.name = publisher.playerName;
+                user.save();
+
+                users.push(user);
+            });
+
+            return users;
         });
 
         sendMessage(res, "Success", {players: response}, 201);

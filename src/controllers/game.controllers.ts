@@ -61,7 +61,7 @@ export const listGames: RequestHandler = async (req, res, next) => {
 export const getOCIDs: RequestHandler = async (req, res, next) => {
     try {
         const games = await Game.findAll({where: {ocId: null}});
-        const allResults: {game: {name: string, id: number}, results: any[]}[] = [];
+        const allResults: {game: {name: string, id: string}, results: any[]}[] = [];
 
         for (const game of games) {
 

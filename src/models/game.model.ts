@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import sequelize from "../db/connection";
 
 export default class Game extends Model {
-    public id!: number;
+    public id!: string;
     public ocId!: number;
     public name!: string;
     public ocScore!: number;
@@ -14,9 +14,8 @@ export default class Game extends Model {
 
 Game.init({
     id: {
-        type: DataTypes.INTEGER.UNSIGNED,
-        primaryKey: true,        
-        autoIncrement: true,
+        type: DataTypes.STRING,
+        primaryKey: true,
     },
     ocId: {
         type: DataTypes.INTEGER.UNSIGNED,
