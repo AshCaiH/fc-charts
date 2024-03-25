@@ -52,3 +52,25 @@ export const fcRequest: RequestHandler = async (req, res) => {
         sendError(req, res, error);
     }
 };
+
+export const convertScore = (score:number) => {
+    const divmod = (x: number, y: number) => [Math.floor(x / y), x % y];
+
+    let convertedScore = score - 70;
+
+    if (60 <= score && score < 90) return convertedScore;
+    
+    if (score > 90) {
+        const overScore = (score - 90) * 2;
+        return 20 + overScore;
+    } else if (score < 60) {
+        const [steps, remainder] = divmod(60 - score, 10);
+        let total = 10;
+
+        const array = Array(steps).fill(10);
+        array.push(remainder);
+        array.map((item, step) => {total += item / (2 ** (step+1))});
+
+        return -total;
+    }
+}
