@@ -24,10 +24,10 @@ export const getReviews: RequestHandler = async (req, res) => {
             const game = gameList[index]
             const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
 
-            if (remainingRequests <= 10) {
-                message = "Ran out of requests."
-                return;
-            }
+            // if (remainingRequests <= 10) {
+            //     message = "Ran out of requests."
+            //     return;
+            // }
 
             let reviewCount = 0;
             reviews.push({name: game.name, reviewCount: 0});
