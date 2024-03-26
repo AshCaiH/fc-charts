@@ -24,10 +24,10 @@ export const getReviews: RequestHandler = async (req, res) => {
             const game = gameList[index]
             const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
 
-            // if (remainingRequests <= 10) {
-            //     message = "Ran out of requests."
-            //     return;
-            // }
+            if (remainingRequests <= 10) {
+                message = "Ran out of requests."
+                break;
+            }
 
             let reviewCount = 0;
             reviews.push({name: game.name, reviewCount: 0});
@@ -41,18 +41,25 @@ export const getReviews: RequestHandler = async (req, res) => {
                     async (response) => {
                         const data = await response.json()
                         reviewCount = data.length
+                        game.lastChecked = new Date(Date.now());
                         return filterReviews(data)
                     }
                 )
 
-                response.map((review) => {
-                    Review.create({
-                        ocId: review.ocId,
-                        ocScore: review.ocScore,
-                        date: review.date,
-                        GameId: game.id,
+                try {
+                    response.map((review) => {
+                        game.lastUpdated = new Date(Date.now());
+
+                        Review.create({
+                            ocId: review.ocId,
+                            ocScore: review.ocScore,
+                            date: review.date,
+                            GameId: game.id,
+                        })
                     })
-                })
+                } catch (error) {
+                    console.log(game.name, error);
+                }
 
                 game.skipReviews += reviewCount;
                 reviews[index].reviewCount += reviewCount;
@@ -60,7 +67,7 @@ export const getReviews: RequestHandler = async (req, res) => {
                 if (reviewCount == 20) await delay(250);
             } while (reviewCount == 20);
             
-            await Game.update({skipReviews: game.skipReviews}, {where: {id: game.id}});
+            await game.save();
         };
         
         sendMessage(res, message, {reviews: reviews}, 201);
