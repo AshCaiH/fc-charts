@@ -30,11 +30,13 @@ export const generateChartData: RequestHandler = async (req, res) => {
                         where: {
                             UserId: user.id,
                             GameId: game.id,
+                            counterpicked: true,
                         }
                     }).then(response => {
-                        if (!response) return;
-                        console.log(`${response.counterpicked} - ${game.name} - ${user.name}`);
-                        return response.counterpicked;
+                        // Sequelize doesn't seem to like reading tinyints, so
+                        // use this slightly hacky workaround to get counterpicks.
+                        if (!response) return false;
+                        return true;
                     });
 
                     const parsedData = item.map((item, index) => {
