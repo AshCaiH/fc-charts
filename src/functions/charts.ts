@@ -21,7 +21,6 @@ export const generateChartData: RequestHandler = async (req, res) => {
             const games: any[] = [];
 
             for (const game of userGames) {
-                console.log(game.id);
                 const gameReviews = await Review.findAll({
                     where: {GameId: game.id}
                 }).then(async (item) => {
@@ -32,7 +31,11 @@ export const generateChartData: RequestHandler = async (req, res) => {
                             UserId: user.id,
                             GameId: game.id,
                         }
-                    }).then(response => {return response!.counterpicked});
+                    }).then(response => {
+                        if (!response) return;
+                        console.log(`${response.counterpicked} - ${game.name} - ${user.name}`);
+                        return response.counterpicked;
+                    });
 
                     const parsedData = item.map((item, index) => {
                         runningTotal += item.ocScore;
