@@ -30,7 +30,7 @@ export const fcRequest: RequestHandler = async (req, res) => {
                 if (!userExists || user.name != publisher.playerName) {
                     user.name == publisher.playerName;
                     updatedUsers.push(user.name);
-                    user.save();
+                    await user.save();
                 }                
 
                 publisher.games.map(async (publishedGame:any) => {
@@ -55,13 +55,23 @@ export const fcRequest: RequestHandler = async (req, res) => {
 
                     if (!gameExists || changedValues > 1) {
                         updatedGames.push(game.toJSON);
-                        game.save();
+                        await game.save();
                     }
+
+                    console.log(game.name, publishedGame.counterPick);
+
+                    await UserGames.destroy({where: {}});
+
+                    const [userGame, exists] = await UserGames.findOrCreate({where: {
+                        UserId: user.id,
+                        GameId: game.id,
+                    }});
+
+                    userGame.counterpicked = (true === publishedGame.counterPick)
+                    await userGame.save();
 
                 });
             });
-
-            console.log("Games", updatedUsers);
 
             return {users: updatedUsers, games: updatedGames};
         });
