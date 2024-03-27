@@ -45,20 +45,23 @@ export const getReviews: RequestHandler = async (req, res) => {
                     }
                 )
 
-                try {
-                    response.map((review) => {
-                        game.lastUpdated = new Date(Date.now());
+                response.map(async (review) => {
+                    const exists = await Review.findOne({where: {ocId: review.ocId}});
 
-                        Review.create({
-                            ocId: review.ocId,
-                            ocScore: review.ocScore,
-                            date: review.date,
-                            GameId: game.id,
-                        })
+                    if (exists) {
+                        console.log(`${game.name} has extra uncounted reviews. Consider wiping all reviews for the game and rerequesting.`);
+                        return;
+                    }
+
+                    game.lastUpdated = new Date(Date.now());
+
+                    await Review.create({
+                        ocId: review.ocId,
+                        ocScore: review.ocScore,
+                        date: review.date,
+                        GameId: game.id,
                     })
-                } catch (error) {
-                    console.log(game.name, error);
-                }
+                })
 
                 game.skipReviews += reviewCount;
                 reviews[index].reviewCount += reviewCount;
