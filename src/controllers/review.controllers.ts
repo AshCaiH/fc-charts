@@ -19,7 +19,6 @@ export const getReviews: RequestHandler = async (req, res) => {
 
         let message: string = "All game reviews acquired";
 
-        // gameList.forEach(async (game, index) => {
         for (const index in gameList) {
             const game = gameList[index]
             const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
@@ -71,18 +70,6 @@ export const getReviews: RequestHandler = async (req, res) => {
         };
         
         sendMessage(res, message, {reviews: reviews}, 201);
-    } catch (error:any) {
-        sendError(req, res, error);
-    }
-};
-
-
-export const reviewsTest: RequestHandler = async (req, res) => {
-    try {
-        const reviews = await Review.findAll({where: {GameId: req.params["gameId"]}});
-        const average = reviews.map((review) => review.ocScore).reduce((acc, curr) => acc + curr) / reviews.length;
-
-        sendMessage(res, `Average score is ${average}`, {}, 201);
     } catch (error:any) {
         sendError(req, res, error);
     }
