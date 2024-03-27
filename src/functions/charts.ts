@@ -18,21 +18,21 @@ export const generateChartData: RequestHandler = async (req, res) => {
                 }
             });
 
-            const userReviews: any[] = [];
+            const games: any[] = [];
 
             for (const game of userGames) {
                 console.log(game.id);
                 const gameReviews = await Review.findAll({
                     where: {GameId: game.id}
-                }).then(item => {
+                }).then(async (item) => {
                     let runningTotal = 0;
 
-                    const counterpicked = UserGames.findOne({
+                    const counterpicked = await UserGames.findOne({
                         where: {
                             UserId: user.id,
                             GameId: game.id,
                         }
-                    }).then(response => response!.counterpicked);
+                    }).then(response => {return response!.counterpicked});
 
                     const parsedData = item.map((item, index) => {
                         runningTotal += item.ocScore;
@@ -45,10 +45,10 @@ export const generateChartData: RequestHandler = async (req, res) => {
                     return {game: game.name, counterpicked: counterpicked, data: parsedData}
                 });
 
-                userReviews.push(gameReviews);
+                games.push(gameReviews);
             }
 
-            result.push({user: user.name, reviews: userReviews});
+            result.push({user: user.name, games: games});
         }
         
         sendMessage(res, "Retrieved reviews for user", {result: result}, 201);
