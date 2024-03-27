@@ -17,34 +17,63 @@ export const fcRequest: RequestHandler = async (req, res) => {
         const url = `https://www.fantasycritic.games/api/League/GetLeagueYear?&leagueID=${process.env.LEAGUE_ID}&year=${process.env.LEAGUE_YEAR}`
 
         const response = await fetch(url,options)
-        .then(async (response) => response.json())
-        .then((response) => {
-            const users: User[] = [];
-            const games: Game[] = [];
+        .then(async (response) => await response.json())
+        .then(async (response) => {
+            const updatedGames: any[] = [];
+            const updatedUsers: any[] = [];
 
-            response.publishers.forEach(async (publisher:any) => {
-                const [user, exists] = await User.findOrCreate({where: {id: publisher.userID}})
-                user.publisherName = ""; // Errors when hitting non-unicode names, dummied out for now.
-                user.name = publisher.playerName;
-                user.save();
-                users.push(user.toJSON());
+            response.publishers.map(async(publisher:any) => {
+                const [user, userExists] = await User.findOrBuild({
+                    where: {id: publisher.userID}
+                })
 
-                publisher.games.forEach(async (published:any) => {
-                    const [game, exists] = await Game.findOrCreate({where: {id: published.masterGame.masterGameID}})
-                    game.ocId = published.masterGame.openCriticID;
-                    game.name = published.masterGame.gameName;
-                    game.ocScore = published.masterGame.criticScore;
-                    game.releaseDate = published.masterGame.releaseDate;
+                if (!userExists || user.name != publisher.playerName) {
+                    user.name == publisher.playerName;
+                    updatedUsers.push(user.name);
+                    await user.save();
+                }                
 
-                    await UserGames.findOrCreate({where: {UserId: user.id, GameId: game.id, counterpicked: published.counterPick}});
+                publisher.games.map(async (publishedGame:any) => {
 
-                    game.save();
-                    games.push(game.toJSON());
+                    const [game, gameExists] = await Game.findOrBuild({
+                        where: {id: publishedGame.masterGame.masterGameID}
+                    });
+
+                    const updateGame = (localkey: string, remotekey: string) => {
+                        if (game.get(localkey) != publishedGame.masterGame[remotekey]) {
+                            console.log(`Updating ${localkey} of ${game.name}:`, game.get(localkey), "->", publishedGame.masterGame[remotekey]);
+                            game.set(localkey, publishedGame.masterGame[remotekey]);
+                            return 1;
+                        } else return 0;
+                    }
+
+                    let changedValues = 0;
+
+                    changedValues += updateGame("name", "gameName");
+                    changedValues += updateGame("ocScore", "criticScore");
+                    // changedValues += updateGame("releaseDate", "releaseDate");
+
+                    if (!gameExists || changedValues > 1) {
+                        updatedGames.push(game.toJSON);
+                        await game.save();
+                    }
+
+                    console.log(game.name, publishedGame.counterPick);
+
+                    await UserGames.destroy({where: {}});
+
+                    const [userGame, exists] = await UserGames.findOrCreate({where: {
+                        UserId: user.id,
+                        GameId: game.id,
+                    }});
+
+                    userGame.counterpicked = (true === publishedGame.counterPick)
+                    await userGame.save();
+
                 });
-
             });
 
-            return {users: users, games: games};
+            return {users: updatedUsers, games: updatedGames};
         });
 
         sendMessage(res, "Success", response, 201);
