@@ -87,7 +87,7 @@ export const convertScore = (score:number) => {
 
     let convertedScore = score - 70;
 
-    if (60 <= score && score < 90) return convertedScore;
+    if (60 <= score && score <= 90) return convertedScore;
     
     if (score > 90) {
         const overScore = (score - 90) * 2;
