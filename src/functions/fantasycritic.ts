@@ -22,6 +22,9 @@ export const fcRequest: RequestHandler = async (req, res) => {
             const updatedGames: any[] = [];
             const updatedUsers: any[] = [];
 
+            await UserGames.destroy({where: {}});
+            console.log("Cleared UserGames");
+
             response.publishers.map(async(publisher:any) => {
                 const [user, userExists] = await User.findOrBuild({
                     where: {id: publisher.userID}
@@ -34,7 +37,6 @@ export const fcRequest: RequestHandler = async (req, res) => {
                 }                
 
                 publisher.games.map(async (publishedGame:any) => {
-
                     const [game, gameExists] = await Game.findOrBuild({
                         where: {id: publishedGame.masterGame.masterGameID}
                     });
@@ -50,17 +52,16 @@ export const fcRequest: RequestHandler = async (req, res) => {
                     let changedValues = 0;
 
                     changedValues += updateGame("name", "gameName");
+                    changedValues += updateGame("ocId", "openCriticID");
                     changedValues += updateGame("ocScore", "criticScore");
                     // changedValues += updateGame("releaseDate", "releaseDate");
 
-                    if (!gameExists || changedValues > 1) {
+                    if (!gameExists || changedValues > 0) {
                         updatedGames.push(game.toJSON);
                         await game.save();
                     }
 
                     console.log(game.name, publishedGame.counterPick);
-
-                    await UserGames.destroy({where: {}});
 
                     const [userGame, exists] = await UserGames.findOrCreate({where: {
                         UserId: user.id,
@@ -69,7 +70,6 @@ export const fcRequest: RequestHandler = async (req, res) => {
 
                     userGame.counterpicked = (true === publishedGame.counterPick)
                     await userGame.save();
-
                 });
             });
 
@@ -87,7 +87,7 @@ export const convertScore = (score:number) => {
 
     let convertedScore = score - 70;
 
-    if (60 <= score && score < 90) return convertedScore;
+    if (60 <= score && score <= 90) return convertedScore;
     
     if (score > 90) {
         const overScore = (score - 90) * 2;
