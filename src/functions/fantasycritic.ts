@@ -70,12 +70,8 @@ export const fcRequest: RequestHandler = async (req, res) => {
 
                     userGame.counterpicked = (true === publishedGame.counterPick)
                     await userGame.save();
-
-                    return;
                 });
             });
-
-            console.log("Ready to return");
 
             return {users: updatedUsers, games: updatedGames};
         });
