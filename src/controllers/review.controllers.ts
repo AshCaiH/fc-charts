@@ -32,8 +32,6 @@ export const getReviews: RequestHandler = async (req, res) => {
             reviews.push({name: game.name, reviewCount: 0});
 
             do {
-                console.log(game.name);
-
                 const response = await fetchRequest(
                         `https://opencritic-api.p.rapidapi.com/reviews/game/${game.ocId}?skip=${game.skipReviews}`
                     ).then(
@@ -49,7 +47,10 @@ export const getReviews: RequestHandler = async (req, res) => {
                     const exists = await Review.findOne({where: {ocId: review.ocId}});
 
                     if (exists) {
-                        console.log(`${game.name} has extra uncounted reviews. Consider wiping all reviews for the game and rerequesting.`);
+                        console.log(`${game.name} has extra uncounted reviews. Wiping all reviews for the game.`);
+                        Review.destroy({where: {GameId: game.id}});
+                        game.skipReviews = 0;
+                        game.save();
                         return;
                     }
 
