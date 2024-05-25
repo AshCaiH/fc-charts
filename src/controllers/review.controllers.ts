@@ -43,7 +43,7 @@ export const getReviews: RequestHandler = async (req, res) => {
                     }
                 )
 
-                response.map(async (review) => {
+                response.every(async (review) => {
                     const exists = await Review.findOne({where: {ocId: review.ocId}});
 
                     if (exists) {
@@ -51,7 +51,7 @@ export const getReviews: RequestHandler = async (req, res) => {
                         Review.destroy({where: {GameId: game.id}});
                         game.skipReviews = 0;
                         game.save();
-                        return;
+                        return false;
                     }
 
                     game.lastUpdated = new Date(Date.now());
@@ -62,6 +62,8 @@ export const getReviews: RequestHandler = async (req, res) => {
                         date: review.date,
                         GameId: game.id,
                     })
+
+                    return true;
                 })
 
                 game.skipReviews += reviewCount;
