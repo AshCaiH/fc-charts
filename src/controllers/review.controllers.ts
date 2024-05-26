@@ -21,11 +21,15 @@ export const getReviews: RequestHandler = async (req, res) => {
 
         let message: string = "All game reviews acquired";
 
-        for (const index in gameList) {
-            const game = gameList[index]
-            const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
+        for (const [index, game] of gameList.entries()) {
+            // const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
 
-            log(`Retrieving reviews for ${game.name}`);            
+            const progressBarLength: number = 20;
+            const progressAmt = Math.floor(progressBarLength * (index / gameList.length))
+            const progressBar: string = "▓".repeat(progressAmt) + "▒".repeat(progressBarLength - progressAmt);
+
+
+            log(`Retrieving reviews for ${game.name}\n${progressBar}`);
 
             // if (remainingRequests <= 10) {
             //     message = "Ran out of requests."
@@ -51,7 +55,8 @@ export const getReviews: RequestHandler = async (req, res) => {
                     const exists = await Review.findOne({where: {ocId: review.ocId}});
 
                     if (exists) {
-                        log(`${game.name} has extra uncounted reviews. Wiping all reviews for the game.`);
+                        log("");
+                        console.log(`${game.name} has extra uncounted reviews. Wiping all reviews for the game.`);
                         Review.destroy({where: {GameId: game.id}});
                         game.skipReviews = 0;
                         game.save();
@@ -78,8 +83,9 @@ export const getReviews: RequestHandler = async (req, res) => {
             
             await game.save();
         };
-
-        log(`Review update completed.`);  
+        
+        const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
+        log(`Review update completed. ${remainingRequests} requests remaining.`);  
         
         sendMessage(res, message, {reviews: reviews}, 201);
     } catch (error:any) {
