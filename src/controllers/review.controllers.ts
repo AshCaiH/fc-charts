@@ -6,6 +6,8 @@ import { Game, Review, Status } from "../models";
 import { fetchRequest } from "../functions/requests";
 import { Op } from "sequelize";
 
+const log = require('single-line-log').stdout;
+
 export const getReviews: RequestHandler = async (req, res) => {
     try {
         if (req.game && !req.game.ocId) throw Error(`${req.game.name} does not have a recorded OpenCritic ID.`)
@@ -19,14 +21,20 @@ export const getReviews: RequestHandler = async (req, res) => {
 
         let message: string = "All game reviews acquired";
 
-        for (const index in gameList) {
-            const game = gameList[index]
-            const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
+        for (const [index, game] of gameList.entries()) {
+            // const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
 
-            if (remainingRequests <= 10) {
-                message = "Ran out of requests."
-                break;
-            }
+            const progressBarLength: number = 20;
+            const progressAmt = Math.floor(progressBarLength * (index / gameList.length))
+            const progressBar: string = "▓".repeat(progressAmt) + "▒".repeat(progressBarLength - progressAmt);
+
+
+            log(`Retrieving reviews for ${game.name}\n${progressBar}`);
+
+            // if (remainingRequests <= 10) {
+            //     message = "Ran out of requests."
+            //     break;
+            // }
 
             let reviewCount = 0;
             reviews.push({name: game.name, reviewCount: 0});
@@ -43,15 +51,16 @@ export const getReviews: RequestHandler = async (req, res) => {
                     }
                 )
 
-                response.map(async (review) => {
+                response.every(async (review) => {
                     const exists = await Review.findOne({where: {ocId: review.ocId}});
 
                     if (exists) {
+                        log("");
                         console.log(`${game.name} has extra uncounted reviews. Wiping all reviews for the game.`);
                         Review.destroy({where: {GameId: game.id}});
                         game.skipReviews = 0;
                         game.save();
-                        return;
+                        return false;
                     }
 
                     game.lastUpdated = new Date(Date.now());
@@ -62,6 +71,8 @@ export const getReviews: RequestHandler = async (req, res) => {
                         date: review.date,
                         GameId: game.id,
                     })
+                    
+                    return true;
                 })
 
                 game.skipReviews += reviewCount;
@@ -72,6 +83,9 @@ export const getReviews: RequestHandler = async (req, res) => {
             
             await game.save();
         };
+        
+        const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
+        log(`Review update completed. ${remainingRequests} requests remaining.`);  
         
         sendMessage(res, message, {reviews: reviews}, 201);
     } catch (error:any) {
