@@ -21,7 +21,7 @@ app.listen(port, async () => {
     Game.hasMany(Review);
 
     Object.values(models).forEach(async model => {await model.sync()});
-    UserGames.sync();
+    UserGames.sync( );
 
     console.log(`Server is listening on port ${port}`);
 });
