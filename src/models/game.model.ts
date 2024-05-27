@@ -10,6 +10,7 @@ export default class Game extends Model {
     public releaseDate!: Date;
     public lastChecked!: Date;
     public lastUpdated!: Date;
+    public isReleased!: Boolean;
 }
 
 Game.init({
@@ -39,6 +40,10 @@ Game.init({
     },
     lastUpdated: {
         type: DataTypes.DATE
+    },
+    isReleased: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     },
 }, {
     timestamps: false,

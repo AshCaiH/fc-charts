@@ -54,6 +54,7 @@ export const fcRequest: RequestHandler = async (req, res) => {
                     changedValues += updateGame("name", "gameName");
                     changedValues += updateGame("ocId", "openCriticID");
                     changedValues += updateGame("ocScore", "criticScore");
+                    changedValues += updateGame("isReleased", "isReleased");
                     // changedValues += updateGame("releaseDate", "releaseDate");
 
                     if (!gameExists || changedValues > 0) {
