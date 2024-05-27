@@ -26,10 +26,9 @@ export const getReviews: RequestHandler = async (req, res) => {
 
             const progressBarLength: number = 20;
             const progressAmt = Math.floor(progressBarLength * (index / gameList.length))
-            const progressBar: string = "▓".repeat(progressAmt) + "▒".repeat(progressBarLength - progressAmt);
 
 
-            log(`Retrieving reviews for ${game.name}\n${progressBar}`);
+            log(`Retrieving reviews for ${game.name}\n${"▓".repeat(progressAmt) + "▒".repeat(progressBarLength - progressAmt)}`);
 
             // if (remainingRequests <= 10) {
             //     message = "Ran out of requests."
@@ -85,7 +84,8 @@ export const getReviews: RequestHandler = async (req, res) => {
         };
         
         const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
-        log(`Review update completed. ${remainingRequests} requests remaining.`);  
+        log("");
+        console.log(`Review update completed. ${remainingRequests} requests remaining.`);  
         
         sendMessage(res, message, {reviews: reviews}, 201);
     } catch (error:any) {
