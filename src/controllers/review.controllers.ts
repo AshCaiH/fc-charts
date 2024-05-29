@@ -17,7 +17,7 @@ export const getReviews: RequestHandler = async (req, res) => {
         const gameList : Game[] = [];
 
         if (req.game) gameList.push(req.game);
-        else gameList.push(...await Game.findAll({where: {ocId: {[Op.not]: null}}}))
+        else gameList.push(...await Game.findAll({where: {ocId: {[Op.not]: null}, ocScore: {[Op.not]: null}}}))
 
         let message: string = "All game reviews acquired";
 
