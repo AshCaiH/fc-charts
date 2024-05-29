@@ -47,7 +47,7 @@ export const generateChartData: RequestHandler = async (req, res) => {
                         return {ocAverage: ocAverage, fcAverage: fcAverage, date: item.date};
                     });
 
-                    return {game: game.name, counterpicked: counterpicked, data: parsedData, isReleased: game.isReleased}
+                    return {title: game.name, counterpicked: counterpicked, data: parsedData, isReleased: game.isReleased}
                 });
 
                 games.push(gameReviews);

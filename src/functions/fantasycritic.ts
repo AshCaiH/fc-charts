@@ -62,8 +62,6 @@ export const fcRequest: RequestHandler = async (req, res) => {
                         await game.save();
                     }
 
-                    console.log(game.name, publishedGame.counterPick);
-
                     const [userGame, exists] = await UserGames.findOrCreate({where: {
                         UserId: user.id,
                         GameId: game.id,
