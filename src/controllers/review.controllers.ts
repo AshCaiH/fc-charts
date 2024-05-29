@@ -36,9 +36,13 @@ export const getReviews: RequestHandler = async (req, res) => {
             // }
 
             let reviewCount = 0;
+            let forceRequest:Boolean = false;
             reviews.push({name: game.name, reviewCount: 0});
 
             do {
+                if (forceRequest) console.log("Forcing new request");
+                forceRequest = false;
+
                 const response = await fetchRequest(
                         `https://opencritic-api.p.rapidapi.com/reviews/game/${game.ocId}?skip=${game.skipReviews}`
                     ).then(
@@ -50,7 +54,7 @@ export const getReviews: RequestHandler = async (req, res) => {
                     }
                 )
 
-                response.every(async (review) => {
+                response.forEach(async (review) => {
                     const exists = await Review.findOne({where: {ocId: review.ocId}});
 
                     if (exists) {
@@ -59,7 +63,8 @@ export const getReviews: RequestHandler = async (req, res) => {
                         Review.destroy({where: {GameId: game.id}});
                         game.skipReviews = 0;
                         game.save();
-                        return false;
+                        forceRequest = true;
+                        return;
                     }
 
                     game.lastUpdated = new Date(Date.now());
@@ -71,14 +76,14 @@ export const getReviews: RequestHandler = async (req, res) => {
                         GameId: game.id,
                     })
                     
-                    return true;
+                    return;
                 })
 
                 game.skipReviews += reviewCount;
                 reviews[index].reviewCount += reviewCount;
                 
                 if (reviewCount == 20) await delay(250);
-            } while (reviewCount == 20);
+            } while (reviewCount == 20 || forceRequest);
             
             await game.save();
         };
