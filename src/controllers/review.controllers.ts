@@ -91,6 +91,8 @@ export const getReviews: RequestHandler = async (req, res) => {
         const remainingRequests = await Status.findOne({}).then((response) => response!.requestsRemaining);
         log("");
         console.log(`Review update completed. ${remainingRequests} requests remaining.`);  
+
+        reviews.filter(review => review.reviewCount > 0);
         
         sendMessage(res, message, {reviews: reviews}, 201);
     } catch (error:any) {
