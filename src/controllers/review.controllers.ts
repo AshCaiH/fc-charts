@@ -48,7 +48,7 @@ const reviewRequestLoop = async(gameList: Game[], reviews: {name: string, review
                     console.log(`${game.name} has extra uncounted reviews. Wiping all reviews for the game.`);
                     Review.destroy({where: {GameId: game.id}});
                     game.skipReviews = 0;
-                    game.save();
+                    await game.save();
                     leftovers.push(game);
                     return;
                 }
