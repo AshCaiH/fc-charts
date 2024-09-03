@@ -4,12 +4,16 @@ import { fetchRequest } from "./requests";
 
 export const filterReviews = (reviews: any[]) => {
     
-    reviews = reviews.filter((review: any) => {
-        if (review.Outlet.isContributor) return false;
-        if (!review.ScoreFormat.isNumeric) return false;
-        if (!review.score) return false;
-        return true;
-    });
+    try {
+        reviews = reviews.filter((review: any) => {
+            if (review.Outlet.isContributor) return false;
+            if (!review.ScoreFormat.isNumeric) return false;
+            if (!review.score) return false;
+            return true;
+        });
+    } catch (e) {
+        console.log(e)
+    }
 
     return reviews.map(function(review) {
         return {
